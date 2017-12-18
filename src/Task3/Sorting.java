@@ -5,7 +5,7 @@ import java.util.Arrays;
 public class Sorting {
 
     public static void main(String[] args) {
-        int[] unsortedArray1 = new int[1000];
+        int[] unsortedArray1 = new int[5000];
 
         Sorting S1 = new Sorting();
         System.out.println("Original unsorted array: ");
@@ -26,9 +26,9 @@ public class Sorting {
         radixSort(unsortedArray1);
         System.out.println();
         int[] arrayForQuicksort = Arrays.copyOf(unsortedArray1, unsortedArray1.length);
-        long start = System.nanoTime();
+        long start = System.currentTimeMillis();
         int[] arraySortedUsingQuicksort = quickSort(arrayForQuicksort, 0, arrayForQuicksort.length-1);
-        long stop = System.nanoTime();
+        long stop = System.currentTimeMillis();
         System.out.println("Quick sort: ");
         System.out.println(Arrays.toString(arraySortedUsingQuicksort));
         System.out.println("Sorting time:" +(stop-start));
@@ -50,7 +50,7 @@ public class Sorting {
 
     public static void choiceSort(int[] arrayToSort){
         int[] array = Arrays.copyOf(arrayToSort, arrayToSort.length);
-        long start = System.nanoTime();
+        long start = System.currentTimeMillis();
         int indexMin;
         for (int index = 0; index < array.length-1; index++) {
             indexMin = index;
@@ -65,13 +65,13 @@ public class Sorting {
         }
         System.out.println("Choice sort: ");
         printArray(array);
-        long stop = System.nanoTime();
+        long stop = System.currentTimeMillis();
         System.out.println("\nSorting time:" +(stop-start));
     }
 
     public static void bubbleSort(int[] arrayToSort){
         int[] array = Arrays.copyOf(arrayToSort, arrayToSort.length);
-        long start = System.nanoTime();
+        long start = System.currentTimeMillis();
         int changeCounter;
         do {
             changeCounter =0;
@@ -86,13 +86,13 @@ public class Sorting {
         } while(changeCounter>0);
         System.out.println("Bubble sort: ");
         printArray(array);
-        long stop = System.nanoTime();
+        long stop = System.currentTimeMillis();
         System.out.println("\nSorting time:" +(stop-start));
     }
 
     public static void insertSort(int[] arrayToSort) {
         int[] array = Arrays.copyOf(arrayToSort, arrayToSort.length);
-        long start = System.nanoTime();
+        long start = System.currentTimeMillis();
         int element;
         int indexToInsert;
         for (int index = 0; index < array.length; index++) {
@@ -107,13 +107,13 @@ public class Sorting {
         }
         System.out.println("Insert sort: ");
         System.out.println(Arrays.toString(array));
-        long stop = System.nanoTime();
+        long stop = System.currentTimeMillis();
         System.out.println("Sorting time:" +(stop-start));
     }
 
     public static void countingSort(int[] arraytoSort){
         int[] array = Arrays.copyOf(arraytoSort, arraytoSort.length);
-        long start = System.nanoTime();
+        long start = System.currentTimeMillis();
         int min = Integer.MAX_VALUE;
         int max = Integer.MIN_VALUE;
         for (int element : array){
@@ -136,75 +136,71 @@ public class Sorting {
         }
         System.out.println("Counting sort: ");
         System.out.println(Arrays.toString(array));
-        long stop = System.nanoTime();
+        long stop = System.currentTimeMillis();
         System.out.println("Sorting time:" +(stop-start));
     }
 
     public static void cocktailSort(int[] arraytoSort){
         int[] array = Arrays.copyOf(arraytoSort, arraytoSort.length);
-        long start = System.nanoTime();
-        int left = 1;
-        int right = array.length-1;
-        do {
-            for (int i = right; i >= left; i--) {
-                if (array[i - 1] > array[1]) {
-                    int temp = array[i];
-                    array[i] = array[i-1];
-                    array[i-1] = temp;
+        long start = System.currentTimeMillis();
+            boolean swapped = true;
+            int i = 0;
+            int j = array.length - 1;
+            while(i < j && swapped){
+                swapped = false;
+                for(int k = i; k < j; k++){
+                    if(array[k] > array[k + 1]){
+                        int temp = array[k];
+                        array[k] = array[k + 1];
+                        array[k + 1] = temp;
+                        swapped = true;
+                    }
                 }
-            }
-            left++;
-            for (int i = left; i <=right; i++) {
-                if (array[i-1]>array[i]){
-                    int temp = array[i];
-                    array[i] = array[i-1];
-                    array[i-1] = temp;
+                j--;
+                if(swapped){
+                    swapped = false;
+                    for(int k = j; k > i; k--){
+                        if(array[k] < array[k - 1]){
+                            int temp = array[k];
+                            array[k] = array[k - 1];
+                            array[k - 1] = temp;
+                            swapped = true;
+                        }
+                    }
                 }
+                i++;
             }
-            right--;
-        }while(left<=right);
         System.out.println("Cocktail sort: ");
         System.out.println(Arrays.toString(array));
-        long stop = System.nanoTime();
+        long stop = System.currentTimeMillis();
         System.out.println("Sorting time:" +(stop-start));
     }
 
-    public static void radixSort(int[] arraytoSort) {
-        int[] array = Arrays.copyOf(arraytoSort, arraytoSort.length);
-        long start = System.nanoTime();
-        int cnt[][] = new int[4][];
-        int b[];
-        int i, j;
-        int a_len = array.length;
-
-        if (a_len < 2) {
-            return;}
-
-        for (j = 0; j < 4; j++) {
-            cnt[j] = new int[257];
-            for (i = 0; i < 257; i++) cnt[j][i] = 0;}
-
-        b = new int[a_len];
-
-        for (i = 0; i < a_len; i++) {
-            for (j = 0; j < 4; j++) {
-                cnt[j][1 + ((array[i] >>> (8 * j)) & 0xff)]++;
+    public static void radixSort(int[] arrayToSort) {
+        int[] array = Arrays.copyOf(arrayToSort, arrayToSort.length);
+        int exp = 1;
+        int R = 10;
+        long start = System.currentTimeMillis();
+        int[] aux = new int[array.length];
+        while (array[0] / exp > 0) {
+            int[] count = new int[R];
+            for (int i = 0; i < array.length; i++) {
+                count[(array[i] / exp) % 10]++;
             }
-        }
-        for (j = 0; j < 4; j++) {
-          for (i = 1; i < 256; i++) {
-              cnt[j][i] += cnt[j][i - 1];
-          }
-            for (i = 0; i < a_len; i++) {
-                b[cnt[j][(array[i] >>> (8 * j)) & 0xff]++] = array[i];
+            for (int i = 1; i < count.length; i++) {
+                count[i] += count[i - 1];
             }
-            for (i = 0; i < a_len; i++){
-                array[i] = b[i];
+            for (int i = array.length - 1; i >= 0; i--) {
+                aux[--count[(array[i] / exp) % 10]] = array[i];
             }
+            for (int i = 0; i < array.length; i++) {
+                array[i] = aux[i];
+            }
+            exp *= 10;
         }
         System.out.println("Radix sort: ");
         System.out.println(Arrays.toString(array));
-        long stop = System.nanoTime();
+        long stop = System.currentTimeMillis();
         System.out.println("Sorting time:" +(stop-start));
     }
 
@@ -226,7 +222,6 @@ public class Sorting {
                     else if (j==pivot) pivot = i;
                 }
             }
-
             quickSort(arrayToSort, low, pivot);
             quickSort(arrayToSort, pivot+1, high);
 
